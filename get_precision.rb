@@ -50,8 +50,6 @@ class Result
 end
 
 
-#実際にアルゴリズムを使ってといた結果と1つのの答えデータを比較して適合率などを計測する
-#答えの辞書データのkeyがuniqueではない
 def get_precision_from_1dict
 
   languages = ["1-2"]
