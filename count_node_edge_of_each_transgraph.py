@@ -13,26 +13,12 @@ MINIMUN_PIVOT=2
 
 def count_edge():
     G=nx.Graph()
-    language="simulation"
+    language="1-8"
     is_all_transgraph=0 #全てのトランスグラフを対象にするか、マルダンのアプリケーションが対象とするものを対象にするか
 
     output_edge_folder="count_edge/"
-    if language=="Ind_Mnk_Zsm":
-        input_filename="count_node_edge/Mnk_Ind_Zsm_new_arbi_original.csv"
-    elif language=="JaToEn_JaToDe":
-         input_filename="joined/JaToEn_JaToDe.csv"
-    elif language=="JaToEn_EnToDe":
-        input_filename="joined/JaToEn_EnToDe.csv"
-    elif language=="JaToDe_DeToEn":
-        input_filename="joined/JaToDe_DeToEn.csv"
-    elif language=="Zh_Uy_Kz":
-        input_filename="joined/Z_U_K.csv"
-    elif language=="EnToJa_EnToDe":
-        input_filename="joined/EnToJa_EnToDe.csv"
-    elif language=="DeToEn_EnToJa":
-        input_filename="joined/DeToEn_EnToJa.csv"
-    elif language=="simulation":
-        input_filename="input/simulation_data.csv"
+
+    input_filename="input/simulation_data-"+language+".csv"
 
     with open(input_filename, 'r') as f:
         dataReader = csv.reader(f)

@@ -161,8 +161,8 @@ end
 
 def measure_feature_value_weighted_average_selection_probability
   # languages = ["JaToEn_EnToDe","JaToDe_DeToEn","JaToEn_JaToDe","Ind_Mnk_Zsm2","Zh_Uy_Kz"]
-  languages = ["2-0"]
-  edge_slope="2-0"
+  languages = ["1-2"]
+  # edge_slope="2-0"
   answer_types=["type0","type1"]
 
   File.open("features_value/features_value_all.csv", "w") do |io_all|
@@ -172,8 +172,8 @@ def measure_feature_value_weighted_average_selection_probability
     # pivot_connected_fixed=2 #ピボット共有率を計測する際の分母(繋がっているノード数)を指定
     output_folder="features_value/"
 
-    answer_filename="answer/#{answer_type}/#{edge_slope}.csv"
-    input_filename="partition/#{edge_slope}/"
+    answer_filename="answer/#{answer_type}/#{language}.csv"
+    input_filename="partition/#{language}/"
     max=999 #Indのときだけ0からはじめる
     min=0
 
