@@ -6,91 +6,104 @@ import csv
 # import pydot
 from pprint import pprint
 # import pandas as pd
-# import numpy as np
+import numpy as np
 
 MINIMUN_NODES=4
 MINIMUN_PIVOT=2
 
 def count_edge():
-    G=nx.Graph()
-    language="1-8"
-    is_all_transgraph=0 #全てのトランスグラフを対象にするか、マルダンのアプリケーションが対象とするものを対象にするか
-
-    output_edge_folder="count_edge/"
-
-    input_filename="input/simulation_data-"+language+".csv"
-
-    with open(input_filename, 'r') as f:
-        dataReader = csv.reader(f)
-        for row in dataReader:
-            # print row[0]
-            if len(row)==3:
-                G.add_node(row[0],lang='En')
-                # G.graph[row[0]]='English'
-                row1_separate =row[1].split(',')
-                row2_separate =row[2].split(',')
-                for lang_a in row1_separate:
-                    G.add_node(lang_a,lang='Ja')
-                    G.add_edge(lang_a,row[0])
-                    # pprint(lang_a)
-
-                for lang_b in row2_separate:
-                    G.add_node(lang_b,lang='De')
-                    G.add_edge(lang_b,row[0])
-
-    graphs = nx.connected_component_subgraphs(G)
-
-    subgraph_count=0
-    pass_subgraph_count=0
 
 
-    with open(output_edge_folder+language+"_edge.csv", "w") as io_edge:
-        for subgraph in graphs:
-            lang=nx.get_node_attributes(subgraph,'lang') # <-この処理遅い
+    input_filename_all="count_edge/number_of_edges.csv"
 
-            pivot_count=0
-            node_all = set()
-            node_a = set()
-            node_b = set()
-            node_p = set()
-            entoja_edge_num=0
-            entode_edge_num=0
-            all_edge_num=0
+    with open(input_filename_all, 'w') as io_edge_all:
+    # language="1-8"
+        languages=["0-8","1-0","1-2","1-5","1-8","2-0","2-2","2-5","2-8","3-0"]
+        for language in languages:
+            G=nx.Graph()
+            # list_num_edge=np.array([])
+            list_num_edge=[]
 
-            if MINIMUN_NODES <= len(subgraph):
-                print("*********************subgraph number:"+str(pass_subgraph_count)+"("+str(subgraph_count)+")***************************")
-                subgraph_count+=1
-                print("*********************subgraph node数:"+str(len(subgraph))+"***************************")
-                pprint(subgraph.nodes())
-                for node in subgraph.nodes():
-                    pprint(node)
-                    pprint(lang[node])
-                    if lang[node]=='En':
-                        pivot_count+=1
+            output_edge_folder="count_edge/"
 
-                if pivot_count >= MINIMUN_PIVOT:
-                    # en_edge_num=pivot_count
-                    # print("英語ノード数")
-                    # pprint(pivot_count)
-                    pass_subgraph_count+=1
-                    print("総エッジ数")
-                    pprint(len(subgraph.edges()))
-                    all_edge_num=len(subgraph.edges())
-                    for node in subgraph.nodes():
-                        if lang[node]=='En':
+            input_filename="input/simulation_data-"+language+".csv"
+
+            with open(input_filename, 'r') as f:
+                dataReader = csv.reader(f)
+                for row in dataReader:
+                    # print row[0]
+                    if len(row)==3:
+                        G.add_node(row[0],lang='En')
+                        # G.graph[row[0]]='English'
+                        row1_separate =row[1].split(',')
+                        row2_separate =row[2].split(',')
+                        for lang_a in row1_separate:
+                            G.add_node(lang_a,lang='Ja')
+                            G.add_edge(lang_a,row[0])
+                            # pprint(lang_a)
+
+                        for lang_b in row2_separate:
+                            G.add_node(lang_b,lang='De')
+                            G.add_edge(lang_b,row[0])
+
+            graphs = nx.connected_component_subgraphs(G)
+
+            subgraph_count=0
+            pass_subgraph_count=0
+
+
+            with open(output_edge_folder+language+"_edge.csv", "w") as io_edge:
+                for subgraph in graphs:
+                    lang=nx.get_node_attributes(subgraph,'lang') # <-この処理遅い
+
+                    pivot_count=0
+                    node_all = set()
+                    node_a = set()
+                    node_b = set()
+                    node_p = set()
+                    entoja_edge_num=0
+                    entode_edge_num=0
+                    all_edge_num=0
+
+                    if MINIMUN_NODES <= len(subgraph):
+                        print("*********************subgraph number:"+str(pass_subgraph_count)+"("+str(subgraph_count)+")***************************")
+                        subgraph_count+=1
+                        print("*********************subgraph node数:"+str(len(subgraph))+"***************************")
+                        pprint(subgraph.nodes())
+                        for node in subgraph.nodes():
                             pprint(node)
-                            for node_ja_de in subgraph.neighbors(node):
-                                if lang[node_ja_de]=='Ja':
-                                    entoja_edge_num+=1
-                                elif lang[node_ja_de]=='De':
-                                    entode_edge_num+=1
+                            pprint(lang[node])
+                            if lang[node]=='En':
+                                pivot_count+=1
 
-                    print("英語->日本語エッジ数")
-                    pprint(entoja_edge_num)
-                    print("英語->ドイツエッジ数")
-                    pprint(entode_edge_num)
-                    io_edge.write(str(all_edge_num)+","+str(entoja_edge_num)+","+str(entode_edge_num)+"\n")
-                    print(str(all_edge_num)+","+str(entoja_edge_num)+","+str(entode_edge_num)+"\n")
+                        if pivot_count >= MINIMUN_PIVOT:
+                            # en_edge_num=pivot_count
+                            # print("英語ノード数")
+                            # pprint(pivot_count)
+                            pass_subgraph_count+=1
+                            print("総エッジ数")
+                            pprint(len(subgraph.edges()))
+                            all_edge_num=len(subgraph.edges())
+                            for node in subgraph.nodes():
+                                if lang[node]=='En':
+                                    pprint(node)
+                                    for node_ja_de in subgraph.neighbors(node):
+                                        if lang[node_ja_de]=='Ja':
+                                            entoja_edge_num+=1
+                                        elif lang[node_ja_de]=='De':
+                                            entode_edge_num+=1
+
+                            print("英語->日本語エッジ数")
+                            pprint(entoja_edge_num)
+                            print("英語->ドイツエッジ数")
+                            pprint(entode_edge_num)
+                            io_edge.write(str(subgraph_count-1)+","+str(all_edge_num)+","+str(entoja_edge_num)+","+str(entode_edge_num)+"\n")
+                            list_num_edge.append(all_edge_num)
+                            # np.append(list_num_edge, all_edge_num)
+                            print(str(subgraph_count-1)+","+str(all_edge_num)+","+str(entoja_edge_num)+","+str(entode_edge_num)+"\n")
+            print(np.average(list_num_edge))
+            io_edge_all.write(language+","+str(np.average(list_num_edge) )+"\n")
+
 
 # def count_node():
 #     G=nx.Graph()
