@@ -5,7 +5,9 @@ require 'set'
 require 'unf'
 
 def main
-  decide_answer_location
+  # decide_answer_locations
+  decide_answer_location_lmh
+  # decide_answer_location_same_num
 end
 class Array
   # 要素の平均を算出する
@@ -112,15 +114,108 @@ class Answer
   attr_accessor :answer_head_trans
 end
 
-def decide_answer_location
-  languages = ["1-2","1-5","1-8","2-0"]
-    languages.each{|language|
-      output_filename="answer/type1/"+language+".csv"
+def decide_answer_location_lmh
+  languages = ["1-0","1-5","2","2-2","2-5","2-8"]
+  languages.each{|language|
+    # output_file_low="answer/type-low/"+language+".csv"
+    # output_file_middle="answer/type-middle/"+language+".csv"
+    # output_file_high="answer/type-high/"+language+".csv"
+    #
+    output_file_u20="answer/u20/"+language+".csv"
+    output_file_u40="answer/u40/"+language+".csv"
+    output_file_u50="answer/u50/"+language+".csv"
+    output_file_u60="answer/u60/"+language+".csv"
+    output_file_u70="answer/u70/"+language+".csv"
+    output_file_u80="answer/u80/"+language+".csv"
+    output_file_u90="answer/u90/"+language+".csv"
+    output_file_u100="answer/u100/"+language+".csv"
 
-      File.open(output_filename, "a") do |io_out|
+    # File.open(output_file_low, "a") do |io_out_low|
+    #   File.open(output_file_middle, "a") do |io_out_middle|
+    #     File.open(output_file_high, "a") do |io_out_high|
+    File.open(output_file_u20, "a") do |io_out_u20|
+      File.open(output_file_u50, "a") do |io_out_u50|
+        File.open(output_file_u70, "a") do |io_out_u70|
+          File.open(output_file_u90, "a") do |io_out_u90|
+            File.open(output_file_u40, "a") do |io_out_u40|
+              File.open(output_file_u60, "a") do |io_out_u60|
+                File.open(output_file_u80, "a") do |io_out_u80|
+                  File.open(output_file_u100, "a") do |io_out_u100|
+                    # pivot_connected_fixed=2 #ピボット共有率を計測する際の分母(繋がっているノード数)を指定
+                    min=0
 
-      # pivot_connected_fixed=2 #ピボット共有率を計測する際の分母(繋がっているノード数)を指定
-      output_folder="newfeature/"
+                    max=999
+                    input_filename="partition/"+language+"/"
+
+                    all_trans_sr_standardized=Array.new
+                    min.upto(max) do |transgraph_itr|
+                      pp input_filename+"#{transgraph_itr}.csv"
+                      transgraph = Transgraph.new(input_filename+"#{transgraph_itr}.csv")
+
+                      pivot_connected=Set.new
+                      pivot_share=Set.new
+                      transgraph.node_a.each{|node_a|
+                        transgraph.node_b.each{|node_b|
+                          pivot_connected=transgraph.lang_a_p[node_a] + transgraph.lang_b_p[node_b]#setの和部分
+                          pivot_share=transgraph.lang_a_p[node_a] & transgraph.lang_b_p[node_b]#setの共通部分
+                          if pivot_connected.size==0 #繋がっていないものがある場合は母集団としカウントしない
+                            # print("とばす")
+                          else
+                            if pivot_connected.size > 1
+                              share_ratio =pivot_share.size.fdiv(pivot_connected.size)
+                              if share_ratio < 0.2
+                                io_out_u20.puts("#{node_a},#{node_b}")
+                              elsif share_ratio < 0.4
+                                io_out_u40.puts("#{node_a},#{node_b}")
+                              elsif share_ratio < 0.5
+                                io_out_u50.puts("#{node_a},#{node_b}")
+                              elsif share_ratio < 0.6
+                                io_out_u60.puts("#{node_a},#{node_b}")
+                              elsif share_ratio < 0.7
+                                io_out_u70.puts("#{node_a},#{node_b}")
+                              elsif share_ratio < 0.8
+                                io_out_u80.puts("#{node_a},#{node_b}")
+                              elsif share_ratio < 0.9
+                                io_out_u90.puts("#{node_a},#{node_b}")
+                              else
+                                io_out_u100.puts("#{node_a},#{node_b}")
+                              end
+                            end
+                          end
+                        }
+                      }
+
+                      #
+                      #
+                      # if transgraph.node_a.size > transgraph.node_b.size
+                      #   transgraph.node_b.each_with_index {|node_b, idx|
+                      #     # io_out.puts("#{transgraph_itr}-a-#{idx},#{transgraph_itr}-b-#{idx}")
+                      #   }
+                      # else
+                      #   transgraph.node_a.each_with_index {|node_a, idx|
+                      #     # io_out.puts("#{transgraph_itr}-a-#{idx},#{transgraph_itr}-b-#{idx}")
+                      #   }
+                      # end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+    end
+
+  }
+end
+#つながっているものの中から選択する
+def decide_answer_location_same_num
+  languages = ["1-0","1-5","2","2-2"]
+  languages.each{|language|
+    output_filename="answer/same_num/"+language+".csv"
+
+    File.open(output_filename, "a") do |io_out|
+
       min=0
 
       max=999
@@ -131,8 +226,39 @@ def decide_answer_location
         pp input_filename+"#{transgraph_itr}.csv"
         transgraph = Transgraph.new(input_filename+"#{transgraph_itr}.csv")
 
+        # transgraph.node_a.each{|node_a|
+        #   transgraph.node_b.each{|node_b|
+        #
+        #
+        #   }
+        # }
+        # is_already_reachable_answer={}
+        # # if language=="Ind_Mnk_Zsm"
+        # if transgraph.lang_a_b.has_key?(answer_key)#同じ日本語の見出し語があるか
+        #   if transgraph.lang_a_b[answer_key].include?(answer_value)#同じドイツ語の単語があるか
+        #     pp "#{answer_key} #{answer_value} exists"
+        #     kvstring+="#{answer_key}:#{answer_value},"
+        #     pivot_connected=transgraph.lang_a_p[answer_key] + transgraph.lang_b_p[answer_value]#setの和部分
+        #     pivot_share=transgraph.lang_a_p[answer_key] & transgraph.lang_b_p[answer_value]#setの共通部分
+        #
+        #     if pivot_connected.size > 1 #答えペアのピボット共有率の分母が1の場合はランダム要素が多いので弾く
+        #       # if pivot_connected.size ==pivot_connected_fixed
+        #       #答えがもともと繋がっていない場合は省く
+        #       if pivot_share.size !=0
+        #         pivot_connected_num_answer.push(pivot_connected.size)#answer_valueとanswer_keyと接続しているpivot
+        #         pivot_share_num_answer.push(pivot_share.size)
+        #         share_ratio_answer.push(pivot_share_num_answer[-1].fdiv(pivot_connected_num_answer[-1])) #pivotの共有率
+        #         pp "こたえあり"
+        #       end
+        #     end
+        #     # else
+        #   end
+        # end
+
+
         if transgraph.node_a.size > transgraph.node_b.size
           transgraph.node_b.each_with_index {|node_b, idx|
+
             io_out.puts("#{transgraph_itr}-a-#{idx},#{transgraph_itr}-b-#{idx}")
           }
         else
