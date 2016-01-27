@@ -52,44 +52,50 @@ end
 
 def get_precision_from_1dict
 
-  languages = ["1-2"]
+  languages = ["1-0","1-5","2","2-2","2-5","2-8"]
   # edge_slope="2-0"
-  answer_types=["type0","type1"]
+  # answer_types=["type-low","type-middle","type-high","same_num"]
+  answer_types=["u20","u40","u50","u60","u70","u80","u90","u100"]
+  t = Time.now
+  strTime = t.strftime("%B-%d-%H-%M-%S")
+  output_all_precision="precision/precision_all_#{strTime}.csv"
 
-  # File.open("features_value/features_value_all.csv", "w") do |io_all|
-  languages.each{|language|
-    answer_types.each{|answer_type|
-      answer_filename="answer/#{answer_type}/#{language}.csv"
-      result_filename="result/csv/#{language}.csv"
-      max=999 #Indのときだけ0からはじめる
-      min=0
+  File.open(output_all_precision, "w") do |io_all|
+    languages.each{|language|
+      answer_types.each{|answer_type|
+        answer_filename="answer/#{answer_type}/#{language}.csv"
+        result_filename="result/csv/#{language}.csv"
+        max=999 #Indのときだけ0からはじめる
+        min=0
 
 
-      output_filename="precision/#{language}_#{answer_type}_precision.csv"
+        output_filename="precision/#{language}_#{answer_type}_precision.csv"
 
-      answer = Answer.new(answer_filename)
-      # pp answer
-      unregistered_num=0;
-      precisions=Array.new#precisionは作成した辞書のうち正しい割合
-      #出力結果の検証
-      File.open(output_filename, "w") do |io|
-        # for num in min .. max do
+        answer = Answer.new(answer_filename)
+        # pp answer
+        unregistered_num=0;
+        precisions=Array.new#precisionは作成した辞書のうち正しい割合
+        #出力結果の検証
+        File.open(output_filename, "w") do |io|
+          # for num in min .. max do
           begin
             CSV.foreach(result_filename) do |rows|
+              #TODO:正解辞書に答えがあるか確認 done
               pp rows
               is_true=0
               is_false=0
               is_not_included=0
-              if answer.answer[rows[0]] && answer.answer[rows[0]].include?(rows[1])
-                is_true=1
-              elsif answer.answer_head_trans[rows[1]] && answer.answer_head_trans[rows[1]].include?(rows[0])
-                is_true=1
+              if answer.answer.has_key?(rows[0]) &&  answer.answer_head_trans.has_key?(rows[1])
+                if answer.answer[rows[0]] && answer.answer[rows[0]].include?(rows[1])
+                  is_true=1
+                elsif answer.answer_head_trans[rows[1]] && answer.answer_head_trans[rows[1]].include?(rows[0])
+                  is_true=1
+                else
+                  is_false=1
+                end
               else
-                is_false=1
+                is_not_included=1
               end
-              # else
-              #   is_not_included=1
-              # end
 
               if is_true ==1
                 io.puts(rows[0]+","+rows[1]+",1,0")
@@ -103,13 +109,16 @@ def get_precision_from_1dict
             pp error.message
             next
           end
-        # end
-        #precision表示
-        pp precisions.inject(0.0){|r,i| r+=i }/precisions.size #precision平均
-        io.puts precisions.inject(0.0){|r,i| r+=i }/precisions.size #precision平均
-      end
+          # end
+          #precision表示
+          precision=precisions.inject(0.0){|r,i| r+=i }/precisions.size
+          pp precision #precision平均
+          io.puts precisions.inject(0.0){|r,i| r+=i }/precisions.size #precision平均
+          io_all.puts "#{language},#{answer_type},#{precision}"
+        end
+      }
     }
-  }
+  end
 end
 
 #実際のアプリケーションで得られた1-1のtsvファイルをcsvファイルに変換
