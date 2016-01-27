@@ -8,7 +8,10 @@ from pprint import pprint
 import os
 
 
-languages=["0-8","1-0","1-2","1-5","1-8","2-0","2-2","2-5","2-8","3-0"]
+# languages=["0-8","1-0","1-2","1-5","1-8","2-0","2-2","2-5","2-8","3-0"]
+# languages = ["1-0","1-5","2","2-2"]
+languages=["2-5","2-8"]
+
 for which_lang in languages:
     G=nx.Graph()
 

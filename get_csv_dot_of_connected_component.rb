@@ -116,7 +116,8 @@ def get_csv_dot_of_connected_component
 
 # =begin
   # languages=["0-8","1-0","1-2","1-5","1-8","2-0","2-2","2-5","2-8","3-0"]
-  languages=["0-8","1-0","1-5","1-8","2-0"]
+  # languages=["0-8","1-0","1-5","1-8","2-0"]
+  languages=["2-5","2-8"]
   languages.each{|which_lang|
     # input_folder="generate_transgraph/simulation_data-#{which_lang}.csv"
     input_folder="partition/#{which_lang}/"

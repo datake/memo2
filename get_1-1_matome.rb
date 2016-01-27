@@ -37,12 +37,15 @@ end
 #実際のアプリケーションで得られた1-1のtsvファイルをcsvファイルに変換
 def convert_from_mardan_1to1
 
-  languages=["1-2"]
+  # languages=["1-2"]
+  # languages=["0-8","1-0","1-5","1-8","2-0"]
+  # languages=["2"]
+  languages=["2-5","2-8"]
   languages.each{|language|
     # output_filename="1-1/csv/"+language+".csv"
 
     oofile_num=1000
-    input_folder="result/#{language}/graph_"
+    input_folder="result/buffer2_#{language}/graph_"
     output_filename="result/csv/"+language+".csv"
 
 
