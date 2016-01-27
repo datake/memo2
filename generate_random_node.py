@@ -9,9 +9,8 @@ from datetime import datetime
 import time
 
 #エッジを張る際の傾斜 #2,1.2,1.5,1.8,2.0,1.0
-EDGE_SLOPE=2.5
-EDGE_SLOPE_STRING="2-5"
-def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count):
+
+def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLOPE,EDGE_SLOPE_STRING):
     itr=[]
     # 実データの枝数に基づく分布
     # weight =[0.3783812933,0.2521690888,0.1451887865,0.06993896472,0.05019433731,0.02662702045,0.0161860435,0.01261468098,0.008239611842,0.006692367802,0.004658431193,0.003966963137,0.00233053026,0.001341815171,0.001616245302,0.001051670595,0.0009350355104,0.0009523962318,0.0002033898305,0.0002033898305,0.0002033898305,0.0002033898305,0.0005423728814,0.0002711864407,0.00006779661017,0.0002033898305,0.00006779661017,0.0002570694087,0.0001355932203,0.00006779661017,0.00006779661017,0.00006779661017]
@@ -47,6 +46,8 @@ def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count):
                 # edge_ap=np.random.randint(np.max([node_a,node_p]), node_a*node_p +1) #np.max([node_a,node_p])からnode_a*node_p まで
                 while True:
                     edge_ap = np.random.choice(itr,p=weight)
+                    # weight_tmp=weight[np.max([node_a,node_p]):node_a*node_p]/weight[np.max([node_a,node_p]):node_a*node_p].sum()
+                    # edge_ap = np.random.choice(itr[np.max([node_a,node_p]):node_a*node_p],p=weight_tmp)
                     if edge_ap>=np.max([node_a,node_p]) and edge_ap<=node_a*node_p:
                         break
 
@@ -62,6 +63,8 @@ def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count):
                 # edge_bp=np.random.randint(np.max([node_b,node_p]), node_b*node_p +1)
                 while True:
                     edge_bp = np.random.choice(itr,p=weight)
+                    # weight_tmp=weight[np.max([node_b,node_p]):node_b*node_p]/weight[np.max([node_b,node_p]):node_b*node_p].sum()
+                    # edge_bp = np.random.choice(itr[np.max([node_b,node_p]):node_b*node_p],p=weight_tmp)
                     if edge_bp>=np.max([node_b,node_p]) and edge_bp<=node_b*node_p:
                         break
                 #重み付きで枝数決める
@@ -237,27 +240,6 @@ def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count):
                         output_file=str(len(dict_node_a))+"-"+str(len(dict_node_p))+"-"+str(len(dict_node_b))+"-"+str(len(dict_ap))+"-"+str(len(dict_bp))+"-"+str(itr_count)
 
                         g_visualize.draw(output_directory+output_new_dir+"/"+output_file+'.pdf',prog='dot')
-                        # string_node_a=""
-                        # string_node_b=""
-                        # last = len(set_A) - 1
-                        # print("set_A:")
-                        # pprint(set_A)
-                        # for i, elem in enumerate(set_A):
-                        #     if i == last:
-                        #         string_node_a+= str(itr_count)+"-"+elem
-                        #     else:
-                        #         string_node_a+= str(itr_count)+"-"+elem
-                        #         string_node_a+= ","
-                        #
-                        # last = len(set_B) - 1
-                        # for i, elem in enumerate(set_B):
-                        #     if i == last:
-                        #         string_node_b+= str(itr_count)+"-"+elem
-                        #     else:
-                        #         string_node_b+= str(itr_count)+"-"+elem
-                        #         string_node_b+= ","
-                        #csv書き込み
-                        # file_csv = open("generate_transgraph/simulation_data.csv","w")
                         with open("generate_transgraph/simulation_data-"+EDGE_SLOPE_STRING+".csv", "a") as io_csv:
                             for i, elem_p in enumerate(list_node_p_name):
                                 io_csv.write("\""+list_node_p_name[i]+"\",\""+list_node_a_name[i]+"\",\""+list_node_b_name[i]+"\"\n")
@@ -287,33 +269,37 @@ def print_all():
 
 
 def weighted_selected():
-    itr_count=0
-    output_directory="generate_transgraph/0125-edge-"+EDGE_SLOPE_STRING+"/"
-    while itr_count<1000:
-#
-        itr=[]
-        weight = [0.2531605027,0.320774498,0.1713213992,0.08402242406,0.04440092051,0.02575478045,0.0149637045,0.01003017924,0.006021465853,0.004034759747,0.002254648857,0.00171581481,0.001427267648,0.00125859926,0.0006137083256,0.000406779661,0.0002711864407,0.0003389830508,0.00006779661017,0.0002033898305,0.0002711864407,0.00006779661017,0.0004103184951,0,0,0,0.00006779661017,0.00006779661017,0,0]
-        weight = np.array(weight)
-        weight = weight/weight.sum()
-        for i in range(1,len(weight)+1):
-            itr.append(i)
+    EDGE_SLOPE_STRINGS=["0-8","1-0","1-2","1-5","1-8","2-0","2-2","2-5","2-8","3-0"]
+    EDGE_SLOPES=["0.8","1.0","1.2","1.5","1.8","2.0","2.2","2.5","2.8","3.0"]
+    for EDGE_SLOPE_STRING in EDGE_SLOPE_STRING:
+        for EDGE_SLOPE in EDGE_SLOPES:
+            itr_count=0
+            output_directory="generate_transgraph/0125-edge-"+EDGE_SLOPE_STRING+"/"
+            while itr_count<1000:
+        #
+                itr=[]
+                weight = [0.2531605027,0.320774498,0.1713213992,0.08402242406,0.04440092051,0.02575478045,0.0149637045,0.01003017924,0.006021465853,0.004034759747,0.002254648857,0.00171581481,0.001427267648,0.00125859926,0.0006137083256,0.000406779661,0.0002711864407,0.0003389830508,0.00006779661017,0.0002033898305,0.0002711864407,0.00006779661017,0.0004103184951,0,0,0,0.00006779661017,0.00006779661017,0,0]
+                weight = np.array(weight)
+                weight = weight/weight.sum()
+                for i in range(1,len(weight)+1):
+                    itr.append(i)
 
-        node_a = np.random.choice(itr,p=weight)
-        node_b = np.random.choice(itr,p=weight)
+                node_a = np.random.choice(itr,p=weight)
+                node_b = np.random.choice(itr,p=weight)
 
-        itr=[]
-        weight_pivot = [0,0.7768958627,0.1542562061,0.03509816081,0.01779913524,0.007474975851,0.002426599238,0.001526246866,0.002923928604,0.0002711864407,0.0006497320378,0.0001355932203,0,0.0001355932203,0,0.0001355932203,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-        weight_pivot = np.array(weight_pivot)
-        weight_pivot = weight_pivot/weight_pivot.sum()
-        for i in range(1,len(weight_pivot)+1):
-            itr.append(i)
-        #重み付きランダム(ノード)
-        node_p = np.random.choice(itr,p=weight_pivot)
-        # generate_transgraph(node_a,node_p,node_b,output_directory)
-        print("node_a:"+str(node_a)+",node_b:"+str(node_b)+",node_p:"+str(node_p))
-        if generate_transgraph(node_a,node_p,node_b,output_directory,itr_count)==1:
-            itr_count+=1
-            with open("generate_transgraph/fail/fail_trans_a_p_b-0125-edge-"+EDGE_SLOPE_STRING+".csv", "a") as io_csv2:
-                io_csv2.write("グラフ作成できずL235,"+str(itr_count)+"a,p,b:"+str(node_a)+","+str(node_p)+","+str(node_b)+"\n")
+                itr=[]
+                weight_pivot = [0,0.7768958627,0.1542562061,0.03509816081,0.01779913524,0.007474975851,0.002426599238,0.001526246866,0.002923928604,0.0002711864407,0.0006497320378,0.0001355932203,0,0.0001355932203,0,0.0001355932203,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+                weight_pivot = np.array(weight_pivot)
+                weight_pivot = weight_pivot/weight_pivot.sum()
+                for i in range(1,len(weight_pivot)+1):
+                    itr.append(i)
+                #重み付きランダム(ノード)
+                node_p = np.random.choice(itr,p=weight_pivot)
+                # generate_transgraph(node_a,node_p,node_b,output_directory)
+                print("node_a:"+str(node_a)+",node_b:"+str(node_b)+",node_p:"+str(node_p))
+                if generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLOPE_STRING,)==1:
+                    itr_count+=1
+                    with open("generate_transgraph/fail/fail_trans_a_p_b-0125-edge-"+EDGE_SLOPE_STRING+".csv", "a") as io_csv2:
+                        io_csv2.write("グラフ作成できずL235,"+str(itr_count)+"a,p,b:"+str(node_a)+","+str(node_p)+","+str(node_b)+"\n")
 
 weighted_selected()
