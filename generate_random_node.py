@@ -10,7 +10,7 @@ import time
 
 #エッジを張る際の傾斜 #2,1.2,1.5,1.8,2.0,1.0
 
-def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLOPE,EDGE_SLOPE_STRING):
+def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLOPE,EDGE_SLOPE_STRING,source_target_kind):
     itr=[]
     # 実データの枝数に基づく分布
     # weight =[0.3783812933,0.2521690888,0.1451887865,0.06993896472,0.05019433731,0.02662702045,0.0161860435,0.01261468098,0.008239611842,0.006692367802,0.004658431193,0.003966963137,0.00233053026,0.001341815171,0.001616245302,0.001051670595,0.0009350355104,0.0009523962318,0.0002033898305,0.0002033898305,0.0002033898305,0.0002033898305,0.0005423728814,0.0002711864407,0.00006779661017,0.0002033898305,0.00006779661017,0.0002570694087,0.0001355932203,0.00006779661017,0.00006779661017,0.00006779661017]
@@ -74,8 +74,8 @@ def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLO
 
             condition=  edge_ap>= node_a and edge_bp>= node_b and edge_ap>= node_p and edge_bp>= node_p #ノード数とエッジの関係
             condition = condition and (node_a*node_p)>=edge_ap and (node_b*node_p)>=edge_bp #これ以上はる枝がない
-            print("a,p,b:"+str(node_a)+","+str(node_p)+","+str(node_b))
-            print("a-p,p-b:"+str(edge_ap)+","+str(edge_bp))
+            # print("a,p,b:"+str(node_a)+","+str(node_p)+","+str(node_b))
+            # print("a-p,p-b:"+str(edge_ap)+","+str(edge_bp))
 
             if condition:
                 tmp=0
@@ -131,7 +131,7 @@ def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLO
 
 
                     # condition=nx.is_connected(G.to_undirected())
-                    if tmp>50:
+                    if tmp>100:
                         print("グラフ作成断念")
                         is_loop_end=1
                         with open("generate_transgraph/fail_log.csv", "a") as io_csv2:
@@ -202,8 +202,8 @@ def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLO
                                         is_not_connect_right=1
 
                                     last = len(set_A) - 1
-                                    print("set_A:")
-                                    pprint(set_A)
+                                    # print("set_A:")
+                                    # pprint(set_A)
                                     for i, elem in enumerate(set_A):
                                         if i == last:
                                             string_node_a+= str(itr_count)+"-"+elem
@@ -237,10 +237,10 @@ def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLO
                             os.makedirs(output_directory+output_new_dir)
 
                         # output_file=str(len(dict_node_a))+"-"+str(len(dict_node_p))+"-"+str(len(dict_node_b))+"-"+str(len(dict_ap))+"-"+str(len(dict_bp))+"-"+str(itr_count)+datetime(2014,1,2,3,4,5).strftime('%s')
-                        output_file=str(len(dict_node_a))+"-"+str(len(dict_node_p))+"-"+str(len(dict_node_b))+"-"+str(len(dict_ap))+"-"+str(len(dict_bp))+"-"+str(itr_count)
+                        output_file=str(source_target_kind)+str(len(dict_node_a))+"-"+str(len(dict_node_p))+"-"+str(len(dict_node_b))+"-"+str(len(dict_ap))+"-"+str(len(dict_bp))+"-"+str(itr_count)
 
                         g_visualize.draw(output_directory+output_new_dir+"/"+output_file+'.pdf',prog='dot')
-                        with open("generate_transgraph/simulation_data-"+EDGE_SLOPE_STRING+".csv", "a") as io_csv:
+                        with open("generate_transgraph/simulation_data-0202-"+EDGE_SLOPE_STRING+"-"+str(source_target_kind)+".csv", "a") as io_csv:
                             for i, elem_p in enumerate(list_node_p_name):
                                 io_csv.write("\""+list_node_p_name[i]+"\",\""+list_node_a_name[i]+"\",\""+list_node_b_name[i]+"\"\n")
 
@@ -251,7 +251,7 @@ def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLO
 
             else:
                 print("グラフ作成できず")
-                with open("generate_transgraph/fail_log"+EDGE_SLOPE_STRING+".csv", "a") as io_csv2:
+                with open("generate_transgraph/fail_log.csv", "a") as io_csv2:
                     io_csv2.write("グラフ作成できずL235,"+str(itr_count)+"a,p,b:"+str(node_a)+","+str(node_p)+","+str(node_b)+",a-p,p-b:"+str(edge_ap)+","+str(edge_bp)+"\n")
 
                 continue
@@ -269,16 +269,32 @@ def print_all():
 
 
 def weighted_selected():
-    EDGE_SLOPE_STRINGS=["0-8","1-0","1-2","1-5","1-8","2-0","2-2","2-5","2-8","3-0"]
-    EDGE_SLOPES=["0.8","1.0","1.2","1.5","1.8","2.0","2.2","2.5","2.8","3.0"]
-    for EDGE_SLOPE_STRING in EDGE_SLOPE_STRING:
-        for EDGE_SLOPE in EDGE_SLOPES:
+    EDGE_SLOPE_STRINGS=["1-0","1-5","2-0","2-5"]
+    # EDGE_SLOPES=["0.8","1.0","1.2","1.5","1.8","2.0","2.2","2.5","2.8","3.0"]
+    # EDGE_SLOPES=["1.0","1.5","2.0","2.5"]
+    source_target_kinds=[1,2,3]
+    # with open("generate_transgraph/fail/fail_trans_a_p_b-0202-edge.csv",  mode='a') as io_csv2:
+
+    for EDGE_SLOPE_STRING in EDGE_SLOPE_STRINGS:
+        # for EDGE_SLOPE in EDGE_SLOPES:
+        for source_target_kind in source_target_kinds:
+            EDGE_SLOPE = float(EDGE_SLOPE_STRING.replace('-', '.'))
             itr_count=0
-            output_directory="generate_transgraph/0125-edge-"+EDGE_SLOPE_STRING+"/"
-            while itr_count<1000:
-        #
+            output_directory="generate_transgraph/0202-edge-"+EDGE_SLOPE_STRING+"-"+str(source_target_kind)+"/"
+            while itr_count<10000:
                 itr=[]
-                weight = [0.2531605027,0.320774498,0.1713213992,0.08402242406,0.04440092051,0.02575478045,0.0149637045,0.01003017924,0.006021465853,0.004034759747,0.002254648857,0.00171581481,0.001427267648,0.00125859926,0.0006137083256,0.000406779661,0.0002711864407,0.0003389830508,0.00006779661017,0.0002033898305,0.0002711864407,0.00006779661017,0.0004103184951,0,0,0,0.00006779661017,0.00006779661017,0,0]
+                #全ての平均
+                # weight = [0.2531605027,0.320774498,0.1713213992,0.08402242406,0.04440092051,0.02575478045,0.0149637045,0.01003017924,0.006021465853,0.004034759747,0.002254648857,0.00171581481,0.001427267648,0.00125859926,0.0006137083256,0.000406779661,0.0002711864407,0.0003389830508,0.00006779661017,0.0002033898305,0.0002711864407,0.00006779661017,0.0004103184951,0,0,0,0.00006779661017,0.00006779661017,0,0]
+                #カザフ
+                if source_target_kind==1:
+                    weight = [0.08406779661,0.186440678,0.1844067797,0.1410169492,0.1186440678,0.0786440678,0.05355932203,0.04406779661,0.02983050847,0.01559322034,0.01898305085,0.01016949153,0.007457627119,0.003389830508,0.003389830508,0.003389830508,0.002711864407,0.002711864407,0.0006779661017,0.001355932203,0.002711864407,0.0006779661017,0.001355932203,0.001355932203,0.001355932203,0.001355932203,0.0006779661017,0.0006779661017]
+                elif source_target_kind==2:
+                    #1が頂点
+                    weight = [0.4049967655,0.3542517914,0.1412188337,0.0555594023,0.01811177552,0.01334188067,0.004073770308,0.002091867002,0.001946591574,0.0009556399212,0.0004415011038,0.0005494505495,0.0004415011038,0.0004415011038]
+                elif source_target_kind==3:
+                    #2が頂点
+                    weight = [0.1056383507,0.3125113362,0.2056782609,0.10535257,0.05870156492,0.02804858334,0.01892721786,0.01144366519,0.005162798045,0.004994044381,0.0003389830508,0.001060350956,0.001703762339,0.001747164143,0.0006868131868,0.0001694915254,0.00016949152,0.0001694915254,0.00016949152,0.0001694915254,0.00016949152,0.00016949152,0.0006868131868,0.00016949152,0.00016949152,0.00016949152,0.00016949152,0.00016949152]
+
                 weight = np.array(weight)
                 weight = weight/weight.sum()
                 for i in range(1,len(weight)+1):
@@ -297,9 +313,9 @@ def weighted_selected():
                 node_p = np.random.choice(itr,p=weight_pivot)
                 # generate_transgraph(node_a,node_p,node_b,output_directory)
                 print("node_a:"+str(node_a)+",node_b:"+str(node_b)+",node_p:"+str(node_p))
-                if generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLOPE_STRING,)==1:
+                if generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLOPE,EDGE_SLOPE_STRING,source_target_kind)==1:
                     itr_count+=1
-                    with open("generate_transgraph/fail/fail_trans_a_p_b-0125-edge-"+EDGE_SLOPE_STRING+".csv", "a") as io_csv2:
-                        io_csv2.write("グラフ作成できずL235,"+str(itr_count)+"a,p,b:"+str(node_a)+","+str(node_p)+","+str(node_b)+"\n")
+                    # with open("generate_transgraph/fail/fail_trans_a_p_b-0202-edge-"+EDGE_SLOPE_STRING+".csv", "a+") as io_csv2:
+                    # io_csv2.write("グラフ作成できず,"+EDGE_SLOPE_STRING+str(itr_count)+"a,p,b:"+str(node_a)+","+str(node_p)+","+str(node_b)+"\n")
 
 weighted_selected()
