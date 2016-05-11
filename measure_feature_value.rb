@@ -163,13 +163,17 @@ def measure_feature_value_weighted_average_selection_probability
   # languages = ["JaToEn_EnToDe","JaToDe_DeToEn","JaToEn_JaToDe","Ind_Mnk_Zsm2","Zh_Uy_Kz"]
   # languages = ["1-2"]
   # languages = ["1-0","1-5","2","2-2"]
-  languages = ["1-0","1-5","2","2-2","2-5","2-8"]
+  # languages = ["1-0","1-5","2","2-2","2-5","2-8"]
+  # languages=["1-0-1","1-0-2","1-0-3","1-5-1","1-5-2","1-5-3","2-0-1","2-0-2","2-0-3"]
+  languages=["1-0-1","1-0-2","1-0-3","1-5-1","1-5-2","1-5-3","2-0-1","2-0-2","2-0-3","2-5-1","2-5-2","2-5-3"]
+
 
   # edge_slope="2-0"
   # answer_types=["type0","type1"]
   # answer_types=["type-low","type-middle","type-high"]
-  answer_types=["u20","u40","u50","u60","u70","u80","u90","u100"]
+  # answer_types=["u20","u40","u50","u60","u70","u80","u90","u100"]
 
+  answer_types=["randum"]
   t = Time.now
   strTime = t.strftime("%B-%d-%H-%M-%S")
   File.open("features_value/features_value_all_#{strTime}.csv", "w") do |io_all|
@@ -182,7 +186,7 @@ def measure_feature_value_weighted_average_selection_probability
 
           answer_filename="answer/#{answer_type}/#{language}.csv"
           input_filename="partition/#{language}/"
-          max=999 #Indのときだけ0からはじめる
+          max=9999 #Indのときだけ0からはじめる
           min=0
 
           answer = Answer.new(answer_filename)

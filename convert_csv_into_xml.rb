@@ -3,9 +3,17 @@ require 'csv'
 # puts "変換するcsvファイルを拡張子なしで指定(例 joined/en-ja-de)"
 # input=$stdin.gets.chomp
 # languages = ["1-2","1-5","1-8","2-0"]
-languages = ["0-8","1-0","2-2","2-5","2-8","3-0"]
+# languages = ["0-8","1-0","2-2","2-5","2-8","3-0"]
+
+# languages=["1-0","1-5"]#,"2-0","2-5"]
+languages=["2-0","2-5"]
+source_target_kinds=[1,2,3]
+
+source_target_kinds.each{|source_target_kind|
+
+
 languages.each{|language|
-  input="simulation_data-#{language}"
+  input="simulation_data-#{language}-#{source_target_kind}"
 
   input_filename="input/"+input+".csv"
   output_filename="xml/#{input}.xml"
@@ -24,4 +32,5 @@ languages.each{|language|
     out.puts "</DocumentElement>"
   end
 
+}
 }

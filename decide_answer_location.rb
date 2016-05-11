@@ -6,8 +6,8 @@ require 'unf'
 
 def main
   # decide_answer_locations
-  decide_answer_location_lmh
-  # decide_answer_location_same_num
+  # decide_answer_location_lmh
+  decide_answer_location_same_num
 end
 class Array
   # 要素の平均を算出する
@@ -115,7 +115,8 @@ class Answer
 end
 
 def decide_answer_location_lmh
-  languages = ["1-0","1-5","2","2-2","2-5","2-8"]
+  # languages = ["1-0","1-5","2","2-2","2-5","2-8"]
+  languages=["1-0-1","1-0-2","1-0-3","1-5-1","1-5-2","1-5-3","2-0-1","2-0-2","2-0-3","2-5-1","2-5-2","2-5-3"]
   languages.each{|language|
     # output_file_low="answer/type-low/"+language+".csv"
     # output_file_middle="answer/type-middle/"+language+".csv"
@@ -144,7 +145,7 @@ def decide_answer_location_lmh
                     # pivot_connected_fixed=2 #ピボット共有率を計測する際の分母(繋がっているノード数)を指定
                     min=0
 
-                    max=999
+                    max=9999
                     input_filename="partition/"+language+"/"
 
                     all_trans_sr_standardized=Array.new
@@ -163,7 +164,9 @@ def decide_answer_location_lmh
                           else
                             if pivot_connected.size > 1
                               share_ratio =pivot_share.size.fdiv(pivot_connected.size)
-                              if share_ratio < 0.2
+                              if share_ratio == 0
+                                #除く
+                              elsif share_ratio < 0.2
                                 io_out_u20.puts("#{node_a},#{node_b}")
                               elsif share_ratio < 0.4
                                 io_out_u40.puts("#{node_a},#{node_b}")
@@ -210,15 +213,14 @@ def decide_answer_location_lmh
 end
 #つながっているものの中から選択する
 def decide_answer_location_same_num
-  languages = ["1-0","1-5","2","2-2"]
+  languages=["1-0-1","1-0-2","1-0-3","1-5-1","1-5-2","1-5-3","2-0-1","2-0-2","2-0-3","2-5-1","2-5-2","2-5-3"]
   languages.each{|language|
-    output_filename="answer/same_num/"+language+".csv"
-
+output_filename="answer/randum/"+language+".csv"
     File.open(output_filename, "a") do |io_out|
 
       min=0
 
-      max=999
+      max=9999
       input_filename="partition/"+language+"/"
 
       all_trans_sr_standardized=Array.new

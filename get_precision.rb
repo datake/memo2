@@ -52,10 +52,15 @@ end
 
 def get_precision_from_1dict
 
-  languages = ["1-0","1-5","2","2-2","2-5","2-8"]
+  # languages = ["1-0","1-5","2","2-2","2-5","2-8"]
+  # languages=["1-0-1","1-0-2","1-0-3","1-5-1","1-5-2","1-5-3","2-0-1","2-0-2","2-0-3"]
+  languages=["1-0-1","1-0-2","1-0-3","1-5-1","1-5-2","1-5-3","2-0-1","2-0-2","2-0-3","2-5-1","2-5-2","2-5-3"]
+
+
   # edge_slope="2-0"
   # answer_types=["type-low","type-middle","type-high","same_num"]
-  answer_types=["u20","u40","u50","u60","u70","u80","u90","u100"]
+  # answer_types=["u20","u40","u50","u60","u70","u80","u90","u100"]
+  answer_types=["randum"]
   t = Time.now
   strTime = t.strftime("%B-%d-%H-%M-%S")
   output_all_precision="precision/precision_all_#{strTime}.csv"
@@ -65,7 +70,7 @@ def get_precision_from_1dict
       answer_types.each{|answer_type|
         answer_filename="answer/#{answer_type}/#{language}.csv"
         result_filename="result/csv/#{language}.csv"
-        max=999 #Indのときだけ0からはじめる
+        max=9999 #Indのときだけ0からはじめる
         min=0
 
 

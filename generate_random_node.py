@@ -45,7 +45,12 @@ def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLO
                 #次のはランダムで可能な枝数の選択を一様ランダム
                 # edge_ap=np.random.randint(np.max([node_a,node_p]), node_a*node_p +1) #np.max([node_a,node_p])からnode_a*node_p まで
                 while True:
-                    edge_ap = np.random.choice(itr,p=weight)
+                    itr_range=itr[np.max([node_a,node_p]):-1]
+                    weight_range=weight[np.max([node_a,node_p]):-1]
+                    weight_range = weight_range/weight_range.sum()
+                    edge_ap = np.random.choice(itr_range,p=weight_range)
+                    # edge_ap = np.random.choice(itr,p=weight)#ここ変更した
+
                     # weight_tmp=weight[np.max([node_a,node_p]):node_a*node_p]/weight[np.max([node_a,node_p]):node_a*node_p].sum()
                     # edge_ap = np.random.choice(itr[np.max([node_a,node_p]):node_a*node_p],p=weight_tmp)
                     if edge_ap>=np.max([node_a,node_p]) and edge_ap<=node_a*node_p:
@@ -62,7 +67,11 @@ def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLO
             else:
                 # edge_bp=np.random.randint(np.max([node_b,node_p]), node_b*node_p +1)
                 while True:
-                    edge_bp = np.random.choice(itr,p=weight)
+                    itr_range=itr[np.max([node_b,node_p]):-1]
+                    weight_range=weight[np.max([node_b,node_p]):-1]
+                    weight_range = weight_range/weight_range.sum()
+                    edge_bp = np.random.choice(itr_range,p=weight_range)
+                    # edge_bp = np.random.choice(itr,p=weight)
                     # weight_tmp=weight[np.max([node_b,node_p]):node_b*node_p]/weight[np.max([node_b,node_p]):node_b*node_p].sum()
                     # edge_bp = np.random.choice(itr[np.max([node_b,node_p]):node_b*node_p],p=weight_tmp)
                     if edge_bp>=np.max([node_b,node_p]) and edge_bp<=node_b*node_p:
@@ -131,7 +140,10 @@ def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLO
 
 
                     # condition=nx.is_connected(G.to_undirected())
-                    if tmp>100:
+                    # if tmp%5000==0:
+                    #     print(str(tmp)
+
+                    if tmp>20000:
                         print("グラフ作成断念")
                         is_loop_end=1
                         with open("generate_transgraph/fail_log.csv", "a") as io_csv2:
@@ -240,9 +252,9 @@ def generate_transgraph(node_a,node_p,node_b,output_directory,itr_count,EDGE_SLO
                         output_file=str(source_target_kind)+str(len(dict_node_a))+"-"+str(len(dict_node_p))+"-"+str(len(dict_node_b))+"-"+str(len(dict_ap))+"-"+str(len(dict_bp))+"-"+str(itr_count)
 
                         g_visualize.draw(output_directory+output_new_dir+"/"+output_file+'.pdf',prog='dot')
-                        with open("generate_transgraph/simulation_data-0202-"+EDGE_SLOPE_STRING+"-"+str(source_target_kind)+".csv", "a") as io_csv:
+                        with open("generate_transgraph/1000-"+EDGE_SLOPE_STRING+"-"+str(source_target_kind)+".csv", "a") as io_csv:
                             for i, elem_p in enumerate(list_node_p_name):
-                                io_csv.write("\""+list_node_p_name[i]+"\",\""+list_node_a_name[i]+"\",\""+list_node_b_name[i]+"\"\n")
+                                io_csv.write("\""+EDGE_SLOPE_STRING+"-"+str(source_target_kind)+list_node_p_name[i]+"\",\""+EDGE_SLOPE_STRING+"-"+str(source_target_kind)+list_node_a_name[i]+"\",\""+EDGE_SLOPE_STRING+"-"+str(source_target_kind)+list_node_b_name[i]+"\"\n")
 
                         is_loop_end=1
                         return 1
@@ -269,7 +281,8 @@ def print_all():
 
 
 def weighted_selected():
-    EDGE_SLOPE_STRINGS=["1-0","1-5","2-0","2-5"]
+    EDGE_SLOPE_STRINGS=["1-0","1-1","1-2","1-3","1-4","1-5","1-6","1-7","1-8","1-9","2-0","2-1","2-2","2-3","2-4","2-5"]
+    # EDGE_SLOPE_STRINGS=["2-5"]
     # EDGE_SLOPES=["0.8","1.0","1.2","1.5","1.8","2.0","2.2","2.5","2.8","3.0"]
     # EDGE_SLOPES=["1.0","1.5","2.0","2.5"]
     source_target_kinds=[1,2,3]
@@ -280,8 +293,8 @@ def weighted_selected():
         for source_target_kind in source_target_kinds:
             EDGE_SLOPE = float(EDGE_SLOPE_STRING.replace('-', '.'))
             itr_count=0
-            output_directory="generate_transgraph/0202-edge-"+EDGE_SLOPE_STRING+"-"+str(source_target_kind)+"/"
-            while itr_count<10000:
+            output_directory="generate_transgraph/1000-edge-"+EDGE_SLOPE_STRING+"-"+str(source_target_kind)+"/"
+            while itr_count<1000:
                 itr=[]
                 #全ての平均
                 # weight = [0.2531605027,0.320774498,0.1713213992,0.08402242406,0.04440092051,0.02575478045,0.0149637045,0.01003017924,0.006021465853,0.004034759747,0.002254648857,0.00171581481,0.001427267648,0.00125859926,0.0006137083256,0.000406779661,0.0002711864407,0.0003389830508,0.00006779661017,0.0002033898305,0.0002711864407,0.00006779661017,0.0004103184951,0,0,0,0.00006779661017,0.00006779661017,0,0]

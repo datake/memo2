@@ -16,7 +16,7 @@ require 'fileutils'
 # LANG_P="Ind_"
 LANG_A="A_"
 LANG_B="B_"
-LANG_P="C_"
+LANG_P="P_"
 
 def main
  get_csv_dot_of_connected_component
@@ -117,7 +117,9 @@ def get_csv_dot_of_connected_component
 # =begin
   # languages=["0-8","1-0","1-2","1-5","1-8","2-0","2-2","2-5","2-8","3-0"]
   # languages=["0-8","1-0","1-5","1-8","2-0"]
-  languages=["2-5","2-8"]
+  # languages=["2-5","2-8"]
+  languages=["1-0-1","1-0-2","1-0-3","1-5-1","1-5-2","1-5-3","2-0-1","2-0-2","2-0-3"]
+
   languages.each{|which_lang|
     # input_folder="generate_transgraph/simulation_data-#{which_lang}.csv"
     input_folder="partition/#{which_lang}/"

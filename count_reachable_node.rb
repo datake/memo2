@@ -162,8 +162,13 @@ end
 def count_reachable_node
   # languages = ["JaToEn_EnToDe","JaToDe_DeToEn","JaToEn_JaToDe","Ind_Mnk_Zsm2","Zh_Uy_Kz"]
   # languages = ["1-2"]
-  # languages = ["1-0","1-5","2","2-2"]
-  languages = ["1-0","1-5","2","2-2","2-5","2-8"]
+  # languages = ["1-0","1-5","2"]
+  languages=["1-0-1","1-0-2","1-0-3","1-5-1","1-5-2","1-5-3","2-0-1","2-0-2","2-0-3","2-5-1","2-5-2","2-5-3"]
+
+  # answer_types=["u20","u40","u50","u60","u70","u80","u90","u100"]
+
+    answer_types=["randum"]
+  # languages = ["1-0","1-5","2","2-2","2-5","2-8"]
 
   t = Time.now
   strTime = t.strftime("%B-%d-%H-%M-%S")
@@ -171,50 +176,86 @@ def count_reachable_node
 
     languages.each{|language|
       File.open("reachable/#{language}_all_#{strTime}.csv", "w") do |io_all_lang|
-        # answer_types.each{|answer_type|
-        is_population_connected_only=1 #母集団の取り方
-        # pivot_connected_fixed=2 #ピボット共有率を計測する際の分母(繋がっているノード数)を指定
-        output_folder="reachable/"
+        answer_types.each{|answer_type|
+          is_population_connected_only=1 #母集団の取り方
+          # pivot_connected_fixed=2 #ピボット共有率を計測する際の分母(繋がっているノード数)を指定
+          output_folder="reachable/"
+          answer_filename="answer/#{answer_type}/#{language}.csv"
+          input_filename="partition/#{language}/"
+          max=9999 #Indのときだけ0からはじめる
+          min=0
+          answer = Answer.new(answer_filename)
+          all_reachable_node_num_arr=Array.new #pivotの共有率
+          min.upto(max) do |transgraph_itr|
+            transgraph = Transgraph.new(input_filename+"#{transgraph_itr}.csv")
+            reachable_node_num_arr=Array.new #pivotの共有率
 
-        input_filename="partition/#{language}/"
-        max=999 #Indのときだけ0からはじめる
-        min=0
-
-        all_reachable_node_num_arr=Array.new #pivotの共有率
-        min.upto(max) do |transgraph_itr|
-          transgraph = Transgraph.new(input_filename+"#{transgraph_itr}.csv")
-          reachable_node_num_arr=Array.new #pivotの共有率
 
 
+            # # 母集団データのピボット共有率の計測
+            # transgraph.node_a.each{|node_a|
+            #   reachable_node_num=0
+            #   is_already_reachable={}
+            #   transgraph.lang_a_p[node_a].each{|reachable_pivot|
+            #     transgraph.lang_p_b[reachable_pivot].each{|reachable_target|
+            #       if is_already_reachable.has_key?(reachable_target) && is_already_reachable[reachable_target]==1
+            #         # pp "reachableすでに登録済み"
+            #       else
+            #         reachable_node_num+=1
+            #         is_already_reachable[reachable_target]=1
+            #       end
+            #     }
+            #   }
+            #   reachable_node_num_arr.push(reachable_node_num)
+            # }
+            #答えのピボット共有率
+            answer.answer.each{|answer_key, answer_values|
+              if answer_values
+                answer_values.each{|answer_value|#全てのanswerのA-Bについて走査
+                  if transgraph.lang_a_b.has_key?(answer_key)#同じ日本語の見出し語があるか
+                    if transgraph.lang_a_b[answer_key].include?(answer_value)#同じドイツ語の単語があるか
+                      # pp "#{answer_key} & #{answer_value} exists"
+                      # kvstring+="#{answer_key} and #{answer_value} exists"
+                      pivot_connected=transgraph.lang_a_p[answer_key] + transgraph.lang_b_p[answer_value]#setの和部分
+                      pivot_share=transgraph.lang_a_p[answer_key] & transgraph.lang_b_p[answer_value]#setの共通部分
 
-          # 母集団データのピボット共有率の計測
-          transgraph.node_a.each{|node_a|
-            reachable_node_num=0
-            is_already_reachable={}
-            transgraph.lang_a_p[node_a].each{|reachable_pivot|
-              transgraph.lang_p_b[reachable_pivot].each{|reachable_target|
-                if is_already_reachable.has_key?(reachable_target) && is_already_reachable[reachable_target]==1
-                  # pp "reachableすでに登録済み"
-                else
-                  reachable_node_num+=1
-                  is_already_reachable[reachable_target]=1
-                end
-              }
+                      #答えがもともと繋がっていない場合は省く
+                      # if pivot_share.size > 0 && share_ratio.size > 0
+                      #reachable計測
+                      reachable_node_num=0
+                      is_already_reachable={}
+                      transgraph.lang_a_p[answer_key].each{|reachable_pivot|
+                        transgraph.lang_p_b[reachable_pivot].each{|reachable_target|
+                          if is_already_reachable.has_key?(reachable_target) && is_already_reachable[reachable_target]==1
+                            # pp "reachableすでに登録済み"
+                          else
+                            reachable_node_num+=1
+                            is_already_reachable[reachable_target]=1
+                          end
+                        }
+                      }
+                      reachable_node_num_arr.push(reachable_node_num)
+                      # end
+                    end
+                  end
+                }
+              end
             }
-            reachable_node_num_arr.push(reachable_node_num)
-          }
+            if reachable_node_num_arr.size>0
+              all_reachable_node_num_arr.push(reachable_node_num_arr.avg)
+            end
+            io_all_lang.puts "#{language},#{answer_type},#{reachable_node_num_arr.avg}"
 
-          all_reachable_node_num_arr.push(reachable_node_num_arr.avg)
-          io_all_lang.puts "#{language},#{reachable_node_num_arr.avg}"
+          end
+          io_all_trans.puts "#{language},#{answer_type},#{all_reachable_node_num_arr.avg}"
+        }
+      end #一言語での全てのトランスグラフ
 
-
-        end #一言語での全てのトランスグラフ
-        io_all_trans.puts "#{language},#{all_reachable_node_num_arr.avg}"
-        # }
-      end
     }
-
   end
+  # }
+
+  # end
 end
 #
 
